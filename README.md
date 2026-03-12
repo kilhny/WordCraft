@@ -16,6 +16,9 @@ Can Wang<sup>5</sup>
 ## News
 **`2022.03.19`**: Our testing code and pretrained model are released.
 
+## Overview
+<img src='assets/framework.png'><p align="center">An overview of the pipeline.
+
 ## Getting Started
 ### Quick Start in Colab (Inference)
 ### 1.Multi-Regional Generation
@@ -29,7 +32,16 @@ python Editing.py
 
 ## Acknowledgements
 This code is based on [OminiControl](https://github.com/Yuanshi9815/OminiControl).
+
 ## Citation
 
 If you find our work useful for your research, please consider citing the following papers :)
 
+```
+@article{wang2026WordCraft,
+  title={WordCraft: Attention-Aware-Interactive-Artistic-Typography-with-Noise-Blending},
+  author={Wang, Zhe and Zhang, Jingbo and Wei, Tianyi and Su, Wanchao and Wang, Can},
+  journal={arXiv preprint arXiv:2507.09573},
+  year={2026}
+}
+```
