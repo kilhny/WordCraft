@@ -10,24 +10,34 @@ from src.flux.regional import prepare_regional_control
 def main():
     # ================= 1. Paths & Basic Configurations =================
     model_id = "black-forest-labs/FLUX.1-dev"
-    lora_dir = "./weights" 
+    lora_dir = "./loras" 
     lora_name = "pytorch_lora_weights.safetensors"
     
-    # Folder/File path configurations
-    image_path = "./assets/input/sample.jpg"          # image_folder: Input original image
-    output_path = "./output/generation_result.jpg"    # output_folder: Output path for the result
-    
-    # Noise save path (Crucial: For subsequent Continuous Editing)
-    save_noise_path = "./output/noise/sample_noise.pt" # Set to None if you do not want to save
+    # Folder/File path configurations based on your directory
+    image_path = "./assets/test/cat.jpg"
+    output_path = "./output/cat_generation_result.jpg"
     
     seed = 42
     use_attention = True # Enable multi-regional generation
     
-    # Prompts for single image testing (Replaces JSON used in batch processing)
-    base_prompt = "A beautiful artistic typography design..."
-    background_prompt = {"description": "A clean, dark background"} 
-    regional_prompt = {"region_1": "Fiery metallic texture, glowing edges"}
-    region_mask_path = "./assets/region_mask/sample"  # region_mask: Folder for auxiliary regional control
+    # Noise save path (Saving to your cat_noise folder)
+    save_noise_path = f"./assets/test/cat_noise/{seed}" 
+    
+    # Prompts based on your "cat" JSON configuration
+    base_prompt = "Playful cat motif combining fluffy tail, and round face"
+    background_prompt = {"description": "Warm white background"} 
+    
+    # Notice how the mask paths/boxes are embedded directly in the dict
+    regional_prompt = {
+        "0": {
+            "description": "Fluffy playful tail",
+            "mask": "./assets/test/cat_region_mask.jpg",
+        },
+        "1": {
+            "description": "Round kitten face",
+            "mask": [201, 260, 442, 451],
+        }
+    }
 
     # ================= 2. Model Loading =================
     print("Loading pipeline...")
@@ -42,9 +52,9 @@ def main():
     # Mask image is not used in the Generation phase
     mask_image = None 
 
-    # Prepare regional attention control
+    # Prepare regional attention control (Passing None for global region_mask as it is in the dict now)
     joint_attention_kwargs = prepare_regional_control(
-        regional_prompt, width, height, background_prompt, region_mask_path
+        regional_prompt, width, height, background_prompt, None
     )
     condition = Condition("depth", image)
 
@@ -66,15 +76,14 @@ def main():
         mask_inject_steps=10,
         layers_list=list(range(57)),
         joint_attention_kwargs=joint_attention_kwargs,
-        save_noise_path=save_noise_path  # <--- Save Noise
+        save_noise_path=save_noise_path  # <--- Save Noise for Editing
     )
 
     # ================= 5. Save Results =================
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     result.images[0].save(output_path)
     print(f"Generation complete! Image saved to: {output_path}")
-    if save_noise_path:
-        print(f"Noise saved to: {save_noise_path}")
+    print(f"Noise successfully saved to: {save_noise_path}")
 
 if __name__ == "__main__":
     main()
