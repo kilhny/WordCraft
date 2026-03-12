@@ -7,37 +7,37 @@ from src.flux.condition import Condition
 from src.flux.generate import generate, seed_everything
 
 def main():
-    # ================= 1. 路径与基础配置 =================
+    # ================= 1. Paths & Basic Configurations =================
     model_id = "black-forest-labs/FLUX.1-dev"
     lora_dir = "./weights" 
     lora_name = "pytorch_lora_weights.safetensors"
     
-    # 文件夹/文件路径配置
-    image_path = "./assets/input/sample.jpg"         # image_folder: 输入的原始图像
-    mask_path = "./assets/masks/sample_mask.jpg"     # mask_folder: 连续编辑专用的 mask
-    output_path = "./output/editing_result.jpg"      # output_folder: 结果输出路径
+    # Folder/File path configurations
+    image_path = "./assets/input/sample.jpg"         # image_folder: Input original image
+    mask_path = "./assets/masks/sample_mask.jpg"     # mask_folder: Mask dedicated for continuous editing
+    output_path = "./output/editing_result.jpg"      # output_folder: Output path for the result
     
-    # Noise 路径 (关键：加载上一步的 Noise，并可选择是否覆盖保存)
-    load_noise_path = "./output/noise/sample_noise.pt" # 必须加载 Generation 生成的 Noise
-    save_noise_path = None # 如果还要继续基于这张图编辑，可以设为 "./output/noise/sample_noise_edited.pt"
+    # Noise paths (Crucial: Load noise from the previous step, and optionally save)
+    load_noise_path = "./output/noise/sample_noise.pt" # Must load the Noise generated from the Generation phase
+    save_noise_path = None # Set to a path if you want to continue editing based on this result
     
     seed = 42
-    use_attention = False # 编辑阶段关闭多区域生成机制
+    use_attention = False # Disable multi-regional generation mechanism during the editing phase
     
-    # 单图测试的提示词 (仅针对被 mask 选中的区域进行编辑)
+    # Prompts for single image testing (Applies only to the region selected by the mask)
     base_prompt = "Change the texture to glowing neon blue..."
 
-    # ================= 2. 模型加载 =================
+    # ================= 2. Model Loading =================
     print("Loading pipeline...")
     pipe = FluxPipeline.from_pretrained(model_id, torch_dtype=torch.bfloat16).to("cuda")
     pipe.load_lora_weights(lora_dir, weight_name=lora_name, adapter_name="depth")
 
-    # ================= 3. 数据准备 =================
+    # ================= 3. Data Preparation =================
     print(f"Processing image: {image_path}")
     image = Image.open(image_path).convert("RGB")
     width, height = image.size
 
-    # Editing 阶段必须加载 mask_image
+    # mask_image must be loaded during the Editing phase
     if os.path.exists(mask_path):
         mask_image = Image.open(mask_path).convert("L")
     else:
@@ -45,7 +45,7 @@ def main():
 
     condition = Condition("depth", image)
 
-    # ================= 4. 运行生成 (编辑) =================
+    # ================= 4. Run Generation (Editing) =================
     print(f"Editing image with seed {seed}...")
     seed_everything(seed)
     
@@ -56,20 +56,20 @@ def main():
         pipe,
         height=height, width=width,
         prompt=base_prompt,
-        mask_image=mask_image,         # <--- 传入局部编辑的 Mask
+        mask_image=mask_image,         # <--- Pass the mask for local editing
         use_attention=use_attention,   # False
         conditions=[condition],
-        mask_inject_steps=10,          # 可根据编辑强度的需求调整
+        mask_inject_steps=10,          # Adjust according to the required editing strength
         layers_list=list(range(57)),
-        joint_attention_kwargs=None,   # 关闭 attention 时传入 None 即可
-        load_noise_path=load_noise_path, # <--- 注入原始 Noise 以保持结构稳定
-        save_noise_path=save_noise_path  # <--- 可选保存新的 Noise
+        joint_attention_kwargs=None,   # Pass None when attention is disabled
+        load_noise_path=load_noise_path, # <--- Inject original Noise to maintain structural stability
+        save_noise_path=save_noise_path  # <--- Optional: Save the new Noise
     )
 
-    # ================= 5. 保存结果 =================
+    # ================= 5. Save Results =================
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     result.images[0].save(output_path)
-    print(f"编辑完成！图像已保存至: {output_path}")
+    print(f"Editing complete! Image saved to: {output_path}")
 
 if __name__ == "__main__":
     main()
