@@ -373,10 +373,10 @@ def generate(
                 return_dict=False,
             )[0]
             if load_noise_path :
-                noise_pred_old = load_noise_pred(i, os.path.join("noise_preds", load_noise_path))
+                noise_pred_old = load_noise_pred(i, load_noise_path)
                 noise_pred = noise_pred * mask + noise_pred_old * (1. - mask)
             if save_noise_path :
-                save_noise_pred(noise_pred, i, os.path.join("noise_preds", save_noise_path))
+                save_noise_pred(noise_pred, i,  save_noise_path)
 
             # compute the previous noisy sample x_t -> x_t-1
             latents_dtype = latents.dtype
