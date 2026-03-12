@@ -19,7 +19,7 @@ def main():
     output_path = "./output/cat_generation_result.jpg"
 
     seed = 42
-    use_attention = True # Enable multi-regional generation
+    use_multi_attention = True # Enable multi-regional generation
 
     # Noise save path (Saving to your cat_noise folder)
     save_noise_path = f"./assets/test/cat_noise/{seed}"
@@ -73,7 +73,7 @@ def main():
         height=height, width=width,
         prompt=base_prompt,
         mask_image=mask_image,
-        use_attention=use_attention,
+        use_attention=use_multi_attention,
         conditions=[condition],
         mask_inject_steps=10,
         layers_list=list(range(57)),
