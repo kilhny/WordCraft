@@ -1,37 +1,39 @@
 import os
 import torch
 from PIL import Image
+
 from diffusers.pipelines import FluxPipeline
 
-from src.flux.condition import Condition
-from src.flux.generate import generate, seed_everything
-from src.flux.regional import prepare_regional_control
+from models.condition import Condition
+from models.generate import generate, seed_everything
+from models.regional import prepare_regional_control
 
 def main():
     # ================= 1. Paths & Basic Configurations =================
     model_id = "black-forest-labs/FLUX.1-dev"
-    lora_dir = "./loras" 
+    lora_dir = "./loras"
     lora_name = "pytorch_lora_weights.safetensors"
-    
+
     # Folder/File path configurations based on your directory
     image_path = "./assets/test/cat.jpg"
     output_path = "./output/cat_generation_result.jpg"
-    
+
     seed = 42
     use_attention = True # Enable multi-regional generation
-    
+
     # Noise save path (Saving to your cat_noise folder)
-    save_noise_path = f"./assets/test/cat_noise/{seed}" 
-    
+    save_noise_path = f"./assets/test/cat_noise/{seed}"
+
     # Prompts based on your "cat" JSON configuration
     base_prompt = "Playful cat motif combining fluffy tail, and round face"
-    background_prompt = {"description": "Warm white background"} 
-    
+    background_prompt = "Warm white background"
+
     # Notice how the mask paths/boxes are embedded directly in the dict
+    regional_mask = "./assets/test"
     regional_prompt = {
         "0": {
             "description": "Fluffy playful tail",
-            "mask": "./assets/test/cat_region_mask_0.jpg",
+            "mask": "cat_region_mask_0.jpg",
         },
         "1": {
             "description": "Round kitten face",
@@ -50,18 +52,18 @@ def main():
     width, height = image.size
 
     # Mask image is not used in the Generation phase
-    mask_image = None 
+    mask_image = None
 
     # Prepare regional attention control (Passing None for global region_mask as it is in the dict now)
     joint_attention_kwargs = prepare_regional_control(
-        regional_prompt, width, height, background_prompt, None
+        regional_prompt, width, height, background_prompt, regional_mask
     )
     condition = Condition("depth", image)
 
     # ================= 4. Run Generation =================
     print(f"Generating image with seed {seed}...")
     seed_everything(seed)
-    
+
     # Ensure the directory for saving noise exists
     if save_noise_path:
         os.makedirs(os.path.dirname(save_noise_path), exist_ok=True)
