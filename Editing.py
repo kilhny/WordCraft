@@ -18,7 +18,7 @@ def main():
     output_path = "./output/cat_editing_result.jpg"
 
     seed = 42
-    use_attention = False # Disable multi-regional generation mechanism
+    use_multi_attention = False # Disable multi-regional generation mechanism
 
     # Noise paths (Loading the noise generated from Scenario 1)
     load_noise_path = f"./assets/test/cat_noise/{seed}"
@@ -54,7 +54,7 @@ def main():
         height=height, width=width,
         prompt=prompt,
         mask_image=mask_image,           # <--- Pass the cat_mask for local editing
-        use_attention=use_attention,     # False
+        use_attention=use_multi_attention,     # False
         conditions=[condition],
         mask_inject_steps=10,
         layers_list=list(range(57)),
