@@ -31,7 +31,7 @@ def main():
     regional_prompt = {
         "0": {
             "description": "Fluffy playful tail",
-            "mask": "./assets/test/cat_region_mask.jpg",
+            "mask": "./assets/test/cat_region_mask_0.jpg",
         },
         "1": {
             "description": "Round kitten face",
