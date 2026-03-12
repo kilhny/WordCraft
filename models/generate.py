@@ -15,7 +15,6 @@ from diffusers.pipelines.flux.pipeline_flux import (
     np,
 )
 from .regional import RegionalProcessor
-from .regional import CudaTimer
 
 def save_noise_pred(noise_pred, step, save_dir="noise_preds"):
     """
@@ -375,9 +374,7 @@ def generate(
             )[0]
             if load_noise_path :
                 noise_pred_old = load_noise_pred(i, os.path.join("noise_preds", load_noise_path))
-                #noise_pred = noise_pred * mask #ce shi
-                with CudaTimer("Noise Blending"):
-                  noise_pred = noise_pred * mask + noise_pred_old * (1. - mask)
+                noise_pred = noise_pred * mask + noise_pred_old * (1. - mask)
             if save_noise_path :
                 save_noise_pred(noise_pred, i, os.path.join("noise_preds", save_noise_path))
 
@@ -427,7 +424,5 @@ def generate(
 
     if not return_dict:
         return (image,)
-
-    CudaTimer.print_stats()
     
     return FluxPipelineOutput(images=image)
