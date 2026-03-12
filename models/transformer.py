@@ -6,12 +6,14 @@ from .lora_controller import enable_lora
 from diffusers.models.transformers.transformer_flux import (
     FluxTransformer2DModel,
     Transformer2DModelOutput,
+    logger,
+)
+from diffusers.utils import (
     USE_PEFT_BACKEND,
     scale_lora_layers,
     unscale_lora_layers,
-    logger,
+    is_torch_version
 )
-from diffusers.utils import is_torch_version
 import numpy as np
 
 
