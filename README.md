@@ -20,6 +20,18 @@ Can Wang<sup>5</sup>
 <img src='assets/framework.png'><p align="center">An overview of the pipeline.
 
 ## Getting Started
+### Prerequisites
+```bash
+torch>=2.0.0
+torchvision
+diffusers==0.30.2
+transformers==4.43.3
+accelerate==0.33.0
+peft==0.12.0
+huggingface_hub==0.24.6
+Pillow
+numpy
+```
 ### Quick Start in Colab (Inference)
 ### 1.Multi-Regional Generation
 ``` shell
