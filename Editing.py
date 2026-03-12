@@ -9,23 +9,23 @@ from src.flux.generate import generate, seed_everything
 def main():
     # ================= 1. Paths & Basic Configurations =================
     model_id = "black-forest-labs/FLUX.1-dev"
-    lora_dir = "./weights" 
+    lora_dir = "./loras" 
     lora_name = "pytorch_lora_weights.safetensors"
     
-    # Folder/File path configurations
-    image_path = "./assets/input/sample.jpg"         # image_folder: Input original image
-    mask_path = "./assets/masks/sample_mask.jpg"     # mask_folder: Mask dedicated for continuous editing
-    output_path = "./output/editing_result.jpg"      # output_folder: Output path for the result
-    
-    # Noise paths (Crucial: Load noise from the previous step, and optionally save)
-    load_noise_path = "./output/noise/sample_noise.pt" # Must load the Noise generated from the Generation phase
-    save_noise_path = None # Set to a path if you want to continue editing based on this result
+    # Folder/File path configurations based on your directory
+    image_path = "./assets/test/cat.jpg"
+    mask_path = "./assets/test/cat_mask.jpg"     # Mask dedicated for continuous editing
+    output_path = "./output/cat_editing_result.jpg"
     
     seed = 42
-    use_attention = False # Disable multi-regional generation mechanism during the editing phase
+    use_attention = False # Disable multi-regional generation mechanism
     
-    # Prompts for single image testing (Applies only to the region selected by the mask)
-    base_prompt = "Change the texture to glowing neon blue..."
+    # Noise paths (Loading the noise generated from Scenario 1)
+    load_noise_path = "./assets/test/cat_noise/{seed}" 
+    save_noise_path = None # Set to a path if you want to save it again
+    
+    # Prompt for single image editing based on your config
+    prompt = "A Snapback cap"
 
     # ================= 2. Model Loading =================
     print("Loading pipeline...")
@@ -48,22 +48,19 @@ def main():
     # ================= 4. Run Generation (Editing) =================
     print(f"Editing image with seed {seed}...")
     seed_everything(seed)
-    
-    if save_noise_path:
-        os.makedirs(os.path.dirname(save_noise_path), exist_ok=True)
 
     result = generate(
         pipe,
         height=height, width=width,
-        prompt=base_prompt,
-        mask_image=mask_image,         # <--- Pass the mask for local editing
-        use_attention=use_attention,   # False
+        prompt=prompt,
+        mask_image=mask_image,           # <--- Pass the cat_mask for local editing
+        use_attention=use_attention,     # False
         conditions=[condition],
-        mask_inject_steps=10,          # Adjust according to the required editing strength
+        mask_inject_steps=10,            
         layers_list=list(range(57)),
-        joint_attention_kwargs=None,   # Pass None when attention is disabled
-        load_noise_path=load_noise_path, # <--- Inject original Noise to maintain structural stability
-        save_noise_path=save_noise_path  # <--- Optional: Save the new Noise
+        joint_attention_kwargs=None,     
+        load_noise_path=load_noise_path, # <--- Inject cat_noise/noise.pt to maintain structure
+        save_noise_path=save_noise_path  
     )
 
     # ================= 5. Save Results =================
