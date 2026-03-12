@@ -14,7 +14,7 @@ Can Wang<sup>5</sup>
 <sup>1</sup>Jiangxi University of Finance and Economics, <sup>2</sup>Tencent Robotics X Lab, <sup>3</sup>Nanyang Technological University, <sup>4</sup>Monash University, <sup>5</sup>Hong Kong University
 
 ## News
-**`2026.03.12`**: Our testing code .
+**`2026.03.12`**:  Our testing code and pretrained model are released .
 
 ## Overview
 <img src='assets/framework.png'><p align="center">An overview of the pipeline.
