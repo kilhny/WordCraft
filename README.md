@@ -43,7 +43,7 @@ python Editing.py
 ```
 
 ## Acknowledgements
-This code is based on [OminiControl](https://github.com/Yuanshi9815/OminiControl).
+This code is based on [OminiControl](https://github.com/Yuanshi9815/OminiControl).The training code for custom weights can also be found in their repository.
 
 ## Citation
 
